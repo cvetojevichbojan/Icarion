@@ -6,10 +6,10 @@ interface AppUpdateMigration<VERSION : Comparable<VERSION>> {
     /**
      * Migration to [targetVersion]
      */
-    fun migrate()
+    suspend fun migrate()
 
     /**
      * Migration rollback if required
      */
-    fun rollback()
+    suspend fun rollback()
 }
