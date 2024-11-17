@@ -19,14 +19,22 @@ interface IcarionLogger {
     fun e(t: Throwable?)
 }
 
-internal object IcarionLoggerAdapter: IcarionLogger {
+/**
+ * You can set your own logger implementation of [IcarionLogger] via [init]
+ */
+object IcarionLoggerAdapter: IcarionLogger {
     private val LOCK = Any()
     private var instance: IcarionLogger? = null
 
-    fun init(adapter: IcarionLogger) {
+    /**
+     * Sets the logger instance for this singleton adapter.
+     *
+     * Invoke once per your app setup if you want to see migration logs.
+     */
+    fun init(logger: IcarionLogger) {
         synchronized(LOCK) {
             if (instance == null) {
-                instance = adapter
+                instance = logger
             }
         }
     }
@@ -34,7 +42,7 @@ internal object IcarionLoggerAdapter: IcarionLogger {
     /**
      * Allows tests to replace the default implementations.
      */
-    fun swap(adapter: IcarionLogger) {
+    internal fun swap(adapter: IcarionLogger) {
         instance = adapter
     }
     override fun d(message: String?) {

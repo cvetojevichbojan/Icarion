@@ -1,21 +1,12 @@
+@Suppress("DSL_SCOPE_VIOLATION") // TODO: Remove once KTIJ-19369 is fixed
 plugins {
-    kotlin("jvm") version "2.0.0"
+    base
+    alias(libs.plugins.kotlinJvm)
 }
 
-group = "xyz.amplituhedron"
-version = "1.0-SNAPSHOT"
-
-repositories {
-    mavenCentral()
-}
-
-dependencies {
-    testImplementation(kotlin("test"))
-}
-
-tasks.test {
-    useJUnitPlatform()
-}
-kotlin {
-    jvmToolchain(17)
+allprojects {
+    repositories {
+        google()
+        mavenCentral()
+    }
 }

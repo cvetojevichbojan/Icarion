@@ -139,11 +139,17 @@ sealed class IcarionFailureRecoveryHint {
  */
 class IcarionMigrator<VERSION : Comparable<VERSION>> {
 
+    /**
+     * Observer to monitor migration events
+     */
     @Volatile
     var migrationObserver: IcarionMigrationObserver<VERSION>? = null
 
+    /**
+     * Default recovery hint if not observer is specified
+     */
     @Volatile
-    var defaultFailureRecoveryHint = IcarionFailureRecoveryHint.Abort
+    var defaultFailureRecoveryHint: IcarionFailureRecoveryHint = IcarionFailureRecoveryHint.Abort
 
     @Volatile
     private var migrationsRunning = false

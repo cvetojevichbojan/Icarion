@@ -4,6 +4,10 @@ package xyz.amplituhedron.icarion
  * Integer based versions for your application. For ex. IntVersion(1), IntVersion(7), ....
  */
 data class IntVersion(val value: Int) : Comparable<IntVersion> {
+    init {
+        require(value >= 0) { "Version numbers must be non-negative." }
+    }
+
     override fun compareTo(other: IntVersion): Int = value.compareTo(other.value)
 }
 
