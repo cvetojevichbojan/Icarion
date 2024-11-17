@@ -7,16 +7,16 @@ package xyz.amplituhedron.icarion.log
 interface IcarionLogger {
 
     /** Log a debug message with optional format args. */
-    fun d(message: String?)
+    fun d(message: String)
 
     /** Log an info message with optional format args. */
-    fun i(message: String?)
+    fun i(message: String)
 
     /** Log an error exception and a message with optional format args. */
-    fun e(t: Throwable?, message: String?)
+    fun e(t: Throwable, message: String)
 
     /** Log an error exception. */
-    fun e(t: Throwable?)
+    fun e(t: Throwable)
 }
 
 /**
@@ -45,18 +45,18 @@ object IcarionLoggerAdapter: IcarionLogger {
     internal fun swap(adapter: IcarionLogger) {
         instance = adapter
     }
-    override fun d(message: String?) {
+    override fun d(message: String) {
         instance?.d(message)
     }
 
-    override fun i(message: String?) {
+    override fun i(message: String) {
         instance?.i(message)
     }
-    override fun e(t: Throwable?, message: String?) {
+    override fun e(t: Throwable, message: String) {
         instance?.e(t, message)
     }
 
-    override fun e(t: Throwable?) {
+    override fun e(t: Throwable) {
         instance?.e(t)
     }
 }

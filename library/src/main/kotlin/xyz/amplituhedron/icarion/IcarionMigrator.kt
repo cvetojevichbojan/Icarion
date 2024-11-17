@@ -1,5 +1,6 @@
 package xyz.amplituhedron.icarion
 
+import xyz.amplituhedron.icarion.log.IcarionLogger
 import xyz.amplituhedron.icarion.log.IcarionLoggerAdapter
 
 /**
@@ -175,7 +176,13 @@ class IcarionMigrator<VERSION : Comparable<VERSION>> {
     }
 
     suspend fun executeMigrations(fromVersion: VERSION, toVersion: VERSION): IcarionMigrationsResult<VERSION> {
-        if (migrationsRunning) return IcarionMigrationsResult.AlreadyRunning()
+        IcarionLoggerAdapter.i("Requesting migration from $fromVersion to $toVersion")
+
+        if (migrationsRunning) {
+            IcarionLoggerAdapter.i("Migrations unavailable because IcarionMigrationsResult.AlreadyRunning")
+
+            return IcarionMigrationsResult.AlreadyRunning()
+        }
 
         migrationsRunning = true
 
@@ -183,12 +190,17 @@ class IcarionMigrator<VERSION : Comparable<VERSION>> {
         val skippedMigrations = mutableSetOf<AppUpdateMigration<VERSION>>()
 
         val eligibleMigrations = getEligibleMigrations(fromVersion, toVersion)
+        IcarionLoggerAdapter.i("Found ${eligibleMigrations.size} eligibleMigrations")
 
         eligibleMigrations.forEach { migration ->
+            IcarionLoggerAdapter.d("Running migration ${migration.targetVersion}")
+
             migrationObserver?.onMigrationStart(migration.targetVersion)
             try {
                 migration.migrate()
                 completedMigrations.add(migration)
+
+                IcarionLoggerAdapter.d("Completed migration ${migration.targetVersion}")
                 migrationObserver?.onMigrationSuccess(migration.targetVersion)
             } catch (e: Exception) {
                 IcarionLoggerAdapter.e(e, "Failed migration ${migration.targetVersion}")
@@ -215,10 +227,15 @@ class IcarionMigrator<VERSION : Comparable<VERSION>> {
 
         migrationsRunning = false
 
-        return IcarionMigrationsResult.Success(
+
+        val result = IcarionMigrationsResult.Success(
             completedMigrations.map { it.targetVersion }.toList(),
             skippedMigrations.map { it.targetVersion }.toList()
         )
+
+        IcarionLoggerAdapter.i("Migration process completed successfully: $result")
+
+        return result
     }
 
     private fun abortMigration(

@@ -3,11 +3,14 @@ package xyz.amplituhedron
 import io.ktor.server.application.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
+import io.ktor.util.logging.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.slf4j.LoggerFactory
 import xyz.amplituhedron.icarion.*
+import xyz.amplituhedron.icarion.log.IcarionLogger
+import xyz.amplituhedron.icarion.log.IcarionLoggerAdapter
 import xyz.amplituhedron.migrations.SampleMigrationTo_v1_2_3
 import xyz.amplituhedron.migrations.SampleMigrationTo_v2_0_0
 import xyz.amplituhedron.migrations.SampleMigrationTo_v2_1_0
@@ -38,6 +41,10 @@ val appMigrationObserver = object : IcarionMigrationObserver<SemanticVersion> {
 fun Application.module() {
     configureRouting()
 
+    // Add logger adapter
+    IcarionLoggerAdapter.init(createLoggerFacade())
+
+    // Create Icarion Migrator
     val icarion = IcarionMigrator<SemanticVersion>().apply {
         migrationObserver = appMigrationObserver
         defaultFailureRecoveryHint = IcarionFailureRecoveryHint.Skip
@@ -60,9 +67,11 @@ fun Application.module() {
                     is IcarionMigrationsResult.AlreadyRunning -> {
                         logger.error("Can not run multiple migrations at the same time!")
                     }
+
                     is IcarionMigrationsResult.Failure -> {
                         logger.error(result.toString())
                     }
+
                     is IcarionMigrationsResult.Success -> {
                         logger.info(result.toString())
                         // Store current active version in persistence
@@ -75,3 +84,24 @@ fun Application.module() {
 
 // Read the current active version from persistence
 private fun fetchCurrentActiveVersion() = SemanticVersion(2, 0, 0)
+
+
+private fun createLoggerFacade() = object : IcarionLogger {
+    private val logger = LoggerFactory.getLogger("IcarionLogger")
+
+    override fun d(message: String) {
+        logger.debug(message)
+    }
+
+    override fun i(message: String) {
+        logger.info(message)
+    }
+
+    override fun e(t: Throwable, message: String) {
+       logger.error(message, t)
+    }
+
+    override fun e(t: Throwable) {
+        logger.error(t)
+    }
+}
