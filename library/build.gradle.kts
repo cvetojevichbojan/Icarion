@@ -21,5 +21,8 @@ dependencies {
     testImplementation(platform(libs.junit.platform))
     testImplementation(libs.junit.jupiter)
     testImplementation(libs.strikt.core)
+
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.2")
+
     testImplementation(kotlin("test"))
 }
