@@ -4,7 +4,10 @@ Icarion is a lightweight, extensible migration library designed to handle versio
 
 Written 100% in Kotlin you can run it on any JVM based system: Android, Ktor, Spring, Desktop, you name it...
 
----
+Inspired by <b>Icarus</b> myth, which is  often interpreted as a cautionary tale about ego, self-sabotage, and the consequences of ignoring wise counsel.
+
+    Icarus, in Greek mythology, son of the inventor Daedalus who perished by flying too near the Sun with waxen wings.
+
 
 ## Features
 
@@ -14,7 +17,6 @@ Written 100% in Kotlin you can run it on any JVM based system: Android, Ktor, Sp
 - **Concurrent Execution Prevention**: Ensures no overlapping migrations are executed.
 - **Custom Recovery Strategies**: Handle failures by skipping, aborting, or rolling back migrations.
 
----
 
 ## Use Cases
 
@@ -26,13 +28,21 @@ Written 100% in Kotlin you can run it on any JVM based system: Android, Ktor, Sp
 
 ---
 
+![Kotlin](https://img.shields.io/badge/kotlin-%237F52FF.svg?style=for-the-badge&logo=kotlin&logoColor=white)
+![License](https://img.shields.io/badge/license-Apache%202.0-blue?style=flat-square)
+![Maven Central Version](https://img.shields.io/maven-central/v/xyz.amplituhedron/icarion)
+
 ## Installation
 
 Add Icarion to your project as a dependency. If you use Gradle, add the following:
 
----
 
 ```kotlin
+repositories {
+    mavenCentral()
+}
+
+
 dependencies {
     implementation("com.example:icarion:1.0.0")
 }

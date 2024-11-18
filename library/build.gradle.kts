@@ -50,6 +50,13 @@ mavenPublishing {
                 distribution = "https://www.apache.org/licenses/LICENSE-2.0.txt"
             }
         }
+        developers {
+            developer {
+                id = "cvetojevichbojan"
+                name = "Bojan Cvetojevic"
+                url = "https://github.com/cvetojevichbojan"
+            }
+        }
         scm {
             url = "https://github.com/cvetojevichbojan/Icarion"
             connection = "scm:git:git://github.com/cvetojevichbojan/Icarion.git"
