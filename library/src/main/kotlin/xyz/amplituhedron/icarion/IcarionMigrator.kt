@@ -4,7 +4,7 @@ import xyz.amplituhedron.icarion.log.IcarionLogger
 import xyz.amplituhedron.icarion.log.IcarionLoggerAdapter
 
 /**
- * Observer with callback to monitor inidividual migration progress
+ * Observer with callback to monitor individual migration progress
  */
 interface IcarionMigrationObserver<VERSION> {
     fun onMigrationStart(version: VERSION)
@@ -55,99 +55,37 @@ sealed class IcarionFailureRecoveryHint {
  *
  * This class is designed to support migrations for any version type that implements the
  * `Comparable` interface, enabling flexible versioning strategies (e.g., integer-based or semantic versioning).
+ * Two types are provided for convenience: [IntVersion] and [SemanticVersion], while all enums work out of the box since they implement the [Comparable] interface.
  *
- * Example usage:
+ * Register migrations via [registerMigration]
  *
- * 1. **IntVersion Example:**
+ * Execute migrations via [executeMigrations] and check the result [IcarionMigrationsResult]
  *
+ * Specify default recovery strategy via [defaultFailureRecoveryHint] and [IcarionFailureRecoveryHint]
+ *
+ * Monitor migrations and control individual recovery strategey via [migrationObserver]
+ *
+ * For logging implement the [IcarionLogger] and set it via [IcarionLoggerAdapter.init]
  * ```kotlin
- * val migrator = IcarionMigrator<Int>()
- *
- * val migrationV1toV2 = AppUpdateMigration(fromVersion = 1, targetVersion = 2) {
- *     // Migration logic for version 1 to version 2
- * }
- * migrator.registerMigration(migrationV1toV2)
- *
- * // Execute migrations from version 1 to version 3
- * val result = migrator.executeMigrations(fromVersion = 1, toVersion = 3)
- * println(result)  // Output will depend on the success or failure of migrations
+ * IcarionLoggerAdapter.init(YourLoggerImpl())
  * ```
  *
- * 2. **SemanticVersion Example:**
+ * For detailed documentation and usage samples please visit the github page [https://github.com/cvetojevichbojan/Icarion]
  *
- * ```kotlin
- * data class SemanticVersion(val major: Int, val minor: Int, val patch: Int) : Comparable<SemanticVersion> {
- *     override fun compareTo(other: SemanticVersion): Int {
- *         return compareValuesBy(this, other, SemanticVersion::major, SemanticVersion::minor, SemanticVersion::patch)
- *     }
- * }
- *
- * val migrator = IcarionMigrator<SemanticVersion>()
- *
- * val migrationV1_0_to_V1_1 = AppUpdateMigration(fromVersion = SemanticVersion(1, 0, 0), targetVersion = SemanticVersion(1, 1, 0)) {
- *     // Migration logic from version 1.0.0 to 1.1.0
- * }
- * migrator.registerMigration(migrationV1_0_to_V1_1)
- *
- * // Execute migrations from version 1.0.0 to 2.0.0
- * val result = migrator.executeMigrations(
- *     fromVersion = SemanticVersion(1, 0, 0),
- *     toVersion = SemanticVersion(2, 0, 0)
- * )
- * println(result)  // Output will depend on the success or failure of migrations
- * ```
- *
- * ### Migration Execution Flow:
- *
- * - The `executeMigrations` method ensures migrations are executed only if no migrations are currently running.
- * - Migrations are executed in ascending order based on the version.
- * - Migration failures are handled with customizable recovery hints, such as:
- *   - `IcarionFailureRecoveryHint.Skip` (skip the migration and continue)
- *   - `IcarionFailureRecoveryHint.Abort` (stop the migration process immediately)
- *   - `IcarionFailureRecoveryHint.Rollback` (roll back completed migrations)
- *
- * ### Migration Registration:
- *
- * Developers can register individual migrations using the `registerMigration` method. Each migration must have a unique `targetVersion` to avoid duplication.
- *
- * ### Example of handling migration failure:
- *
- * If a migration fails, the `onMigrationFailure` callback of the `IcarionMigrationObserver` will be invoked.
- * You can define custom recovery behavior within this callback:
- *
- * ```kotlin
- * class MyMigrationObserver : IcarionMigrationObserver<SemanticVersion> {
- *     override fun onMigrationStart(version: SemanticVersion) {
- *         println("Starting migration to version $version")
- *     }
- *
- *     override fun onMigrationSuccess(version: SemanticVersion) {
- *         println("Successfully migrated to version $version")
- *     }
- *
- *     override fun onMigrationFailure(version: SemanticVersion, exception: Exception): IcarionFailureRecoveryHint {
- *         println("Migration to version $version failed: ${exception.message}")
- *         // Custom logic to decide recovery
- *         return IcarionFailureRecoveryHint.Rollback
- *     }
- * }
- *
- * val migrator = IcarionMigrator<SemanticVersion>()
- * migrator.migrationObserver = MyMigrationObserver()
- * ```
- *
- * @param VERSION The type of versioning to use, which must implement the `Comparable` interface.
+ * @param VERSION your Version type (Comparable<VERSION>)
  */
 class IcarionMigrator<VERSION : Comparable<VERSION>> {
 
     /**
-     * Observer to monitor migration events
+     * Observer to monitor migration events and react to failures via individual [IcarionFailureRecoveryHint]'s
      */
     @Volatile
     var migrationObserver: IcarionMigrationObserver<VERSION>? = null
 
     /**
-     * Default recovery hint if not observer is specified
+     * Default recovery hint if no observer is specified.
+     *
+     * Defaults to [IcarionFailureRecoveryHint.Abort]
      */
     @Volatile
     var defaultFailureRecoveryHint: IcarionFailureRecoveryHint = IcarionFailureRecoveryHint.Abort
@@ -157,6 +95,10 @@ class IcarionMigrator<VERSION : Comparable<VERSION>> {
 
     private val migrations = mutableSetOf<AppUpdateMigration<VERSION>>()
 
+    /**
+     * Register migration for later execution
+     * @param migration
+     */
     @Throws(IllegalStateException::class, IllegalArgumentException::class)
     fun registerMigration(migration: AppUpdateMigration<VERSION>) {
         if (migrationsRunning) {
@@ -169,14 +111,16 @@ class IcarionMigrator<VERSION : Comparable<VERSION>> {
         migrations.add(migration)
     }
 
-    private fun getEligibleMigrations(fromVersion: VERSION, toVersion: VERSION): List<AppUpdateMigration<VERSION>> {
-        return migrations
-            .filter { it.targetVersion > fromVersion && it.targetVersion <= toVersion }
-            .sortedBy { it.targetVersion }
-    }
-
-    suspend fun executeMigrations(fromVersion: VERSION, toVersion: VERSION): IcarionMigrationsResult<VERSION> {
-        IcarionLoggerAdapter.i("Requesting migration from $fromVersion to $toVersion")
+    /**
+     * Executes registered migrations in sequence between ([fromVersion], [toVersionInclusive]] and returns [IcarionMigrationsResult]
+     *
+     * For realtime migration progress and recovery handling, checkout [migrationObserver] and [IcarionMigrationObserver]
+     *
+     * @param fromVersion from which version are you upgrading
+     * @param toVersionInclusive to which version you are upgrading
+     */
+    suspend fun executeMigrations(fromVersion: VERSION, toVersionInclusive: VERSION): IcarionMigrationsResult<VERSION> {
+        IcarionLoggerAdapter.i("Requesting migration from $fromVersion to $toVersionInclusive")
 
         if (migrationsRunning) {
             IcarionLoggerAdapter.i("Migrations unavailable because IcarionMigrationsResult.AlreadyRunning")
@@ -189,7 +133,7 @@ class IcarionMigrator<VERSION : Comparable<VERSION>> {
         val completedMigrations = mutableSetOf<AppUpdateMigration<VERSION>>()
         val skippedMigrations = mutableSetOf<AppUpdateMigration<VERSION>>()
 
-        val eligibleMigrations = getEligibleMigrations(fromVersion, toVersion)
+        val eligibleMigrations = getEligibleMigrations(fromVersion, toVersionInclusive)
         IcarionLoggerAdapter.i("Found ${eligibleMigrations.size} eligibleMigrations")
 
         eligibleMigrations.forEach { migration ->
@@ -238,6 +182,12 @@ class IcarionMigrator<VERSION : Comparable<VERSION>> {
         return result
     }
 
+    private fun getEligibleMigrations(fromVersion: VERSION, toVersion: VERSION): List<AppUpdateMigration<VERSION>> {
+        return migrations
+            .filter { it.targetVersion > fromVersion && it.targetVersion <= toVersion }
+            .sortedBy { it.targetVersion }
+    }
+
     private fun abortMigration(
         completed: Set<AppUpdateMigration<VERSION>>,
         skipped: Set<AppUpdateMigration<VERSION>>
@@ -257,7 +207,7 @@ class IcarionMigrator<VERSION : Comparable<VERSION>> {
     ): IcarionMigrationsResult.Failure<VERSION> {
         val rolledBackMigrations = executeRollback(completed.toList())
         return IcarionMigrationsResult.Failure(
-            completedNotRolledBackMigrations = (completed - rolledBackMigrations).map { it.targetVersion }.toList(),
+            completedNotRolledBackMigrations = (completed.map { it.targetVersion } - rolledBackMigrations.map { it.targetVersion }).toList(),
             skippedMigrations = skipped.map { it.targetVersion }.toList(),
             rolledBackMigrations = rolledBackMigrations.map { it.targetVersion }.toList()
         )

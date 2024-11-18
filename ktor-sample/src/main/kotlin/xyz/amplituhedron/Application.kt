@@ -60,7 +60,7 @@ fun Application.module() {
             withContext(Dispatchers.IO) {
                 val result = icarion.executeMigrations(
                     fromVersion = fetchCurrentActiveVersion(),
-                    toVersion = SemanticVersion(2, 1, 0) // For ex fetch target app version from application.conf
+                    toVersionInclusive = SemanticVersion(2, 1, 0) // For ex fetch target app version from application.conf
                 )
 
                 when (result) {

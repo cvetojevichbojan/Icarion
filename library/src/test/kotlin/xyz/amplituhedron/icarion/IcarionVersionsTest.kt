@@ -27,18 +27,6 @@ class IcarionVersionsTest {
     }
 
     @Test
-    fun `Valid SemanticVersion should compare correctly`() {
-        val v100 = SemanticVersion(1, 0, 0)
-        val v110 = SemanticVersion(1, 1, 0)
-        val v200 = SemanticVersion(2, 0, 0)
-
-        expectThat(v100).isLessThan(v110) // 1.0.0 < 1.1.0
-        expectThat(v110).isGreaterThan(v100) // 1.1.0 > 1.0.0
-        expectThat(v100).isEqualTo(SemanticVersion(1, 0, 0)) // 1.0.0 == 1.0.0
-        expectThat(v100).isLessThan(v200) // 1.0.0 < 2.0.0
-    }
-
-    @Test
     fun `SemanticVersion with invalid version should throw an exception`() {
         expectCatching {
             SemanticVersion(-1, 0, 0)
@@ -56,23 +44,27 @@ class IcarionVersionsTest {
     @Test
     fun `SemanticVersion comparison logic should handle all components (major, minor, patch)`() {
         val v100 = SemanticVersion(1, 0, 0)
-        val v110 = SemanticVersion(1, 1, 0)
         val v101 = SemanticVersion(1, 0, 1)
+        val v110 = SemanticVersion(1, 1, 0)
         val v200 = SemanticVersion(2, 0, 0)
         val v201 = SemanticVersion(2, 0, 1)
         val v210 = SemanticVersion(2, 1, 0)
         val v211 = SemanticVersion(2, 1, 1)
 
         // Comparing by major version
-        expectThat(v100).isLessThan(v200)
-        expectThat(v100).isLessThan(v201)
-        expectThat(v100).isLessThan(v210)
-        expectThat(v100).isLessThan(v211)
+        expectThat(v100)
+            .isLessThan(v200)
+            .isLessThan(v201)
+            .isLessThan(v210)
+            .isLessThan(v211)
 
         // Comparing by minor version
-        expectThat(v100).isLessThan(v110)
-        expectThat(v200).isLessThan(v210)
-        expectThat(v200).isLessThan(v211)
+        expectThat(v100)
+            .isLessThan(v110)
+
+        expectThat(v200)
+            .isLessThan(v210)
+            .isLessThan(v211)
 
         // Comparing by patch version
         expectThat(v100).isLessThan(v101)
@@ -85,4 +77,34 @@ class IcarionVersionsTest {
         expectThat(v210 == SemanticVersion(2, 1, 0)).isTrue()
         expectThat(v211 == SemanticVersion(2, 1, 1)).isTrue()
     }
+
+    @Test
+    fun `Valid CustomAppNamedVersion should compare correctly`() {
+        val v1 = CustomAppEnumVersion.ACACIA
+        val v2 = CustomAppEnumVersion.BIRCH
+        val v3 = CustomAppEnumVersion.CEDAR
+        val v4 = CustomAppEnumVersion.DOUGLAS_FIR
+
+        expectThat(v1).isLessThan(v2).isLessThan(v3).isLessThan(v3) // 1 < 2 < 3 < 4
+        expectThat(v2).isGreaterThan(v1).isLessThan(v3).isLessThan(v3)
+
+        expectThat(v4).isNotEqualTo(v3)
+
+        expectThat(v4)
+            .isGreaterThan(v3)
+            .isGreaterThan(v2)
+            .isGreaterThan(v1)
+            .isEqualTo(CustomAppEnumVersion.DOUGLAS_FIR)
+    }
+
+}
+
+enum class CustomAppEnumVersion {
+    ACACIA,
+    BIRCH,
+    CEDAR,
+    DOUGLAS_FIR,
+    OAK,
+    PINE,
+    SEQUOIA;
 }
