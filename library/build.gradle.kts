@@ -7,7 +7,7 @@ plugins {
 
 group = "xyz.amplituhedron"
 val artifactId = "icarion"
-version = "1.0"
+version = "1.0.1"
 
 kotlin {
     jvmToolchain(libs.versions.java.get().toInt())

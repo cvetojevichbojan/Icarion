@@ -14,6 +14,7 @@ import xyz.amplituhedron.icarion.log.IcarionLoggerAdapter
 import xyz.amplituhedron.migrations.SampleMigrationTo_v1_2_3
 import xyz.amplituhedron.migrations.SampleMigrationTo_v2_0_0
 import xyz.amplituhedron.migrations.SampleMigrationTo_v2_1_0
+import xyz.amplituhedron.migrations.SampleMigrationTo_v2_1_3
 
 fun main() {
     embeddedServer(Netty, port = 8080, host = "0.0.0.0", module = Application::module).start(wait = true)
@@ -37,6 +38,7 @@ fun Application.module() {
         registerMigration(SampleMigrationTo_v1_2_3())
         registerMigration(SampleMigrationTo_v2_0_0())
         registerMigration(SampleMigrationTo_v2_1_0())
+        registerMigration(SampleMigrationTo_v2_1_3())
     }
 
     environment.monitor.subscribe(ApplicationStarted) {
@@ -45,7 +47,7 @@ fun Application.module() {
             withContext(Dispatchers.IO) {
                 val result = icarion.executeMigrations(
                     fromVersion = fetchCurrentActiveVersion(),
-                    toVersionInclusive = SemanticVersion(2, 1, 0) // For ex fetch target app version from application.conf
+                    toVersionInclusive = SemanticVersion(2, 1, 3) // For ex fetch target app version from application.conf
                 )
 
                 when (result) {

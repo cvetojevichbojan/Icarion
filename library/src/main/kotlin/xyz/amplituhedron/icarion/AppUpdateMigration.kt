@@ -5,6 +5,8 @@ interface AppUpdateMigration<VERSION : Comparable<VERSION>> {
 
     /**
      * Migration to [targetVersion]
+     *
+     * Intentionally failed migrations should throw an exception here, for ex. throw RuntimeException("Can not migrate all data to external storage..")
      */
     suspend fun migrate()
 

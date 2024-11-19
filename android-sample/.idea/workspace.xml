@@ -10,12 +10,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="17bff64b-4e95-4ea7-a9e5-458e9de247b2" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/app/src/main/java/xyz/amplituhedron/android_icarion/IcarionApplication.kt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/src/main/java/xyz/amplituhedron/android_icarion/migrations/AppMigrationV2.kt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/src/main/java/xyz/amplituhedron/android_icarion/migrations/AppMigrationV3.kt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/src/main/java/xyz/amplituhedron/android_icarion/migrations/AppMigrationV7.kt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/src/main/java/xyz/amplituhedron/android_icarion/migrations/VersionRepository.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../README.md" beforeDir="false" afterPath="$PROJECT_DIR$/../README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

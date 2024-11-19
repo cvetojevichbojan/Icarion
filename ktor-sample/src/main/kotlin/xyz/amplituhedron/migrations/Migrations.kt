@@ -57,3 +57,20 @@ class SampleMigrationTo_v2_1_0(override val targetVersion: SemanticVersion = Sem
     }
 
 }
+
+class SampleMigrationTo_v2_1_3(override val targetVersion: SemanticVersion = SemanticVersion(2, 1, 3)) :
+    AppUpdateMigration<SemanticVersion> {
+
+    private val logger = LoggerFactory.getLogger(Application::class.java)
+
+    override suspend fun migrate() {
+        logger.info("Migrating Sample Migration to $targetVersion")
+
+        logger.info("Generating default file cache templates for user profiles which have a Firebase config")
+    }
+
+    override suspend fun rollback() {
+        logger.info("No rollback needed for this migration.")
+    }
+
+}

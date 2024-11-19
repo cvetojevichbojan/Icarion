@@ -20,9 +20,26 @@ sealed class IcarionMigrationsResult<VERSION> {
         IcarionMigrationsResult<VERSION>()
 
     data class Failure<VERSION>(
+        /**
+         *  Migrations that completed but were not rolled back due to fallback hint or rollback failure.
+         */
         val completedNotRolledBackMigrations: List<VERSION>,
+        /**
+         * Migrations which failed but were "recovered" via [IcarionFailureRecoveryHint.Skip]
+         */
         val skippedMigrations: List<VERSION>,
-        val rolledBackMigrations: List<VERSION>
+        /**
+         * Migrations which failed but were rolled back due to [IcarionFailureRecoveryHint.Rollback]
+         */
+        val rolledBackMigrations: List<VERSION>,
+        /**
+         * All migrations which were selected for migration between (currentVersion, targetVersion]
+         */
+        val eligibleMigrations: List<VERSION>,
+        /**
+         * Migration [VERSION] which caused the Failure
+         */
+        val failedMigration: VERSION
     ) : IcarionMigrationsResult<VERSION>()
 
     data class AlreadyRunning<VERSION>(private val running: Boolean = true) : IcarionMigrationsResult<VERSION>()
@@ -161,10 +178,10 @@ class IcarionMigrator<VERSION : Comparable<VERSION>> {
                     }
 
                     is IcarionFailureRecoveryHint.Abort ->
-                        return abortMigration(completed = completedMigrations, skipped = skippedMigrations)
+                        return abortMigration(allMigrations = eligibleMigrations, completed = completedMigrations, skipped = skippedMigrations, failedMigration = migration)
 
                     is IcarionFailureRecoveryHint.Rollback ->
-                        return rollbackMigration(completed = completedMigrations, skipped = skippedMigrations)
+                        return rollbackMigration(allMigrations = eligibleMigrations, completed = completedMigrations, skipped = skippedMigrations, failedMigration = migration)
                 }
             }
         }
@@ -189,27 +206,35 @@ class IcarionMigrator<VERSION : Comparable<VERSION>> {
     }
 
     private fun abortMigration(
+        allMigrations: Collection<AppUpdateMigration<VERSION>>,
         completed: Set<AppUpdateMigration<VERSION>>,
-        skipped: Set<AppUpdateMigration<VERSION>>
+        skipped: Set<AppUpdateMigration<VERSION>>,
+        failedMigration: AppUpdateMigration<VERSION>
     ): IcarionMigrationsResult.Failure<VERSION> {
         IcarionLoggerAdapter.i("Aborting migration")
 
         return IcarionMigrationsResult.Failure(
             completedNotRolledBackMigrations = completed.map { it.targetVersion }.toList(),
             skippedMigrations = skipped.map { it.targetVersion }.toList(),
-            rolledBackMigrations = emptyList()
+            rolledBackMigrations = emptyList(),
+            eligibleMigrations = allMigrations.map { it.targetVersion },
+            failedMigration = failedMigration.targetVersion
         )
     }
 
     private suspend fun rollbackMigration(
+        allMigrations: Collection<AppUpdateMigration<VERSION>>,
         completed: Set<AppUpdateMigration<VERSION>>,
-        skipped: Set<AppUpdateMigration<VERSION>>
+        skipped: Set<AppUpdateMigration<VERSION>>,
+        failedMigration: AppUpdateMigration<VERSION>
     ): IcarionMigrationsResult.Failure<VERSION> {
         val rolledBackMigrations = executeRollback(completed.toList())
         return IcarionMigrationsResult.Failure(
             completedNotRolledBackMigrations = (completed.map { it.targetVersion } - rolledBackMigrations.map { it.targetVersion }).toList(),
             skippedMigrations = skipped.map { it.targetVersion }.toList(),
-            rolledBackMigrations = rolledBackMigrations.map { it.targetVersion }.toList()
+            rolledBackMigrations = rolledBackMigrations.map { it.targetVersion }.toList(),
+            eligibleMigrations = allMigrations.map { it.targetVersion },
+            failedMigration = failedMigration.targetVersion
         )
     }
 

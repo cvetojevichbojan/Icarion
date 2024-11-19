@@ -51,11 +51,11 @@ repositories {
 
 
 dependencies {
-    implementation("com.example:icarion:1.0.0")
+    implementation("com.example:icarion:1.0.1")
 }
 ```
 ---
-## Integratation
+## Integration
 
 ### Define Your Versioning Scheme
 You can use any versioning system that implements `Comparable`. Icarion comes with two versioning schemes out of the box for easier integration: 
@@ -123,6 +123,8 @@ class FeatureUpgradeMigrationV110 : AppUpdateMigration<SemanticVersion> {
     override suspend fun migrate() {
         println("Upgrading feature to version $targetVersion")
         // Add feature-specific migration logic here
+      
+        // Intentionally failed migrations should throw an exception here, for ex. throw RuntimeException("Can not migrate all data to external storage...")
     }
 
     override suspend fun rollback() {
@@ -195,13 +197,15 @@ Result Types
 * <b>Success</b> - Indicates that all migrations have been successfully completed or skipped.
   - Fields:
     - completedMigrations: A list of successfully completed migrations.
-    - skippedMigrations: A list of migrations that were skipped (they failed but you returned <b>Skip</b> from migration observer).
+    - skippedMigrations: A list of migrations that were skipped (they failed, but you returned <b>Skip</b> from migration observer).
 * <b>Failure</b> - Represents a migration failure and provides information about rollback operations.
   - Fields:
-    -	completedNotRolledBackMigrations: A list of migrations that completed but were not rolled back due to failure.
-    -	skippedMigrations: A list of migrations that were skipped.
-    -	rolledBackMigrations: A list of migrations that were attempted but rolled back due to an error.
-* <b>AlreadyRunning</b> - Indicates that another migration process is already in progress.
+    -	completedNotRolledBackMigrations: Migrations that completed but were not rolled back due to fallback hint or rollback failure
+    -	skippedMigrations: Migrations which failed but were "recovered" via ```IcarionFailureRecoveryHint.Skip```
+    -	rolledBackMigrations: Migrations which failed but were rolled back due to ```IcarionFailureRecoveryHint.Rollback```
+    -   failedMigration: Migration [VERSION] which caused the Failure
+    -   eligibleMigrations: All migrations which were selected for migration between (currentVersion, targetVersion]
+* <b>AlreadyRunning</b> - Indicates that another migration process is already in progress
 
 
 ### Migration Observer
@@ -296,6 +300,10 @@ The IcarionMigrator simplifies version migrations by handling:
 You’re now ready to run migrations in your app!
 
 ---
+
+## TODO
+
+- Kotlin multiplatform
 
 ## Contributing
 
