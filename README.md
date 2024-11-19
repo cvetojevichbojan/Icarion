@@ -175,7 +175,7 @@ To execute migrations, invoke the migrateTo method, specifying current and the t
 val currentVersion = IntVersion("1")
 val targetVersion = IntVersion("5")
 
-migrator.migrateTo(
+val result = migrator.migrateTo(
     from = currentVersion,
     to = targetVersion
 )
@@ -183,7 +183,26 @@ migrator.migrateTo(
 
 In this example he migrator runs all migrations from version 1 up to and including 5.
 
----
+
+### Migration Result
+
+Migration Result
+
+The IcarionMigrationsResult class encapsulates the outcome of executed migrations, providing a detailed report of the migration process.
+
+Result Types
+
+* <b>Success</b> - Indicates that all migrations have been successfully completed or skipped.
+  - Fields:
+    - completedMigrations: A list of successfully completed migrations.
+    - skippedMigrations: A list of migrations that were skipped (they failed but you returned <b>Skip</b> from migration observer).
+* <b>Failure</b> - Represents a migration failure and provides information about rollback operations.
+  - Fields:
+    -	completedNotRolledBackMigrations: A list of migrations that completed but were not rolled back due to failure.
+    -	skippedMigrations: A list of migrations that were skipped.
+    -	rolledBackMigrations: A list of migrations that were attempted but rolled back due to an error.
+* <b>AlreadyRunning</b> - Indicates that another migration process is already in progress.
+
 
 ### Migration Observer
 
