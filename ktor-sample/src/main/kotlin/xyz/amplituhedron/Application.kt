@@ -20,23 +20,6 @@ fun main() {
 }
 
 val logger = LoggerFactory.getLogger(Application::class.java)
-val appMigrationObserver = object : IcarionMigrationObserver<SemanticVersion> {
-    override fun onMigrationStart(version: SemanticVersion) {
-        logger.info("onMigrationStart ${version.toString()}")
-    }
-
-    override fun onMigrationSuccess(version: SemanticVersion) {
-        logger.info("onMigrationSuccess ${version.toString()}")
-    }
-
-    override fun onMigrationFailure(
-        version: SemanticVersion, exception: Exception
-    ): IcarionFailureRecoveryHint {
-        logger.error("onMigrationFailure ${version.toString()}")
-
-        return IcarionFailureRecoveryHint.Skip
-    }
-}
 
 fun Application.module() {
     configureRouting()
@@ -47,6 +30,8 @@ fun Application.module() {
     // Create Icarion Migrator
     val icarion = IcarionMigrator<SemanticVersion>().apply {
         migrationObserver = appMigrationObserver
+
+        // Default will be applied if you omit the migration observer
         defaultFailureRecoveryHint = IcarionFailureRecoveryHint.Skip
 
         registerMigration(SampleMigrationTo_v1_2_3())
@@ -82,10 +67,34 @@ fun Application.module() {
     }
 }
 
-// Read the current active version from persistence
+/**
+ * IcarionMigrationObserver example
+ */
+val appMigrationObserver = object : IcarionMigrationObserver<SemanticVersion> {
+    override fun onMigrationStart(version: SemanticVersion) {
+        logger.info("onMigrationStart ${version.toString()}")
+    }
+
+    override fun onMigrationSuccess(version: SemanticVersion) {
+        logger.info("onMigrationSuccess ${version.toString()}")
+    }
+
+    override fun onMigrationFailure(
+        version: SemanticVersion, exception: Exception
+    ): IcarionFailureRecoveryHint {
+        logger.error("onMigrationFailure ${version.toString()}")
+
+        // Skip if its non breaking for ex.
+        return IcarionFailureRecoveryHint.Skip
+    }
+}
+
+// Mock read the current active version from persistence
 private fun fetchCurrentActiveVersion() = SemanticVersion(2, 0, 0)
 
-
+/**
+ * Sl4fj logger facade
+ */
 private fun createLoggerFacade() = object : IcarionLogger {
     private val logger = LoggerFactory.getLogger("IcarionLogger")
 

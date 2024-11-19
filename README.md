@@ -37,7 +37,7 @@ Inspired by <b>Icarus</b> myth, which is  often interpreted as a cautionary tale
 
 ![Kotlin](https://img.shields.io/badge/kotlin-%237F52FF.svg?style=for-the-badge&logo=kotlin&logoColor=white)
 ![License](https://img.shields.io/badge/license-Apache%202.0-blue?style=flat-square)
-![Maven Central Version](https://img.shields.io/maven-central/v/xyz.amplituhedron/icarion)
+[![Maven Central Version](https://img.shields.io/maven-central/v/xyz.amplituhedron/icarion)](https://central.sonatype.com/artifact/xyz.amplituhedron/icarion)
 
 ## Installation
 
@@ -117,7 +117,7 @@ class SampleMigration : AppUpdateMigration<IntVersion> {
 
 #### Example: Migration to SemanticVersion(1, 1, 0)
 ```kotlin
-class FeatureUpgradeMigration : AppUpdateMigration<SemanticVersion> {
+class FeatureUpgradeMigrationV110 : AppUpdateMigration<SemanticVersion> {
     override val targetVersion = SemanticVersion(1, 1, 0)
 
     override suspend fun migrate() {
@@ -264,7 +264,7 @@ private fun createLoggerFacade() = object : IcarionLogger {
 
 ## Samples
 
-Take a look at working samples in the following folders ktor-sample, android-sample (TODO), desktop-sample (TODO).
+Take a look at working samples in the following folders ktor-sample, android-sample, desktop-sample (TODO).
 
 ## Summary
 
