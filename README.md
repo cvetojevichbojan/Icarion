@@ -2,7 +2,9 @@
 
 Icarion is a lightweight, extensible migration library designed to handle version-based migrations for your application. It supports both rollback and recovery mechanisms for fine-grained control over migrations, making it ideal for settings and configuration changes, file migrations, even database updates and more.
 
-Written 100% in Kotlin you can run it on any JVM based system: Android, Ktor, Spring, Desktop, you name it...
+Written 100% in Kotlin you can run it on any JVM based system: Android, Ktor, Spring, Desktop, you name it...Android based projects were the main culprit behind Icarion idea as many times devs would just perform SharedPreferences or FirebaseConfig data updates in the Application onCreate() based on current BuildConfig version value without any long term organization of migrations.    
+
+This library is here to help alleviate some of the pain of rolling out your own system of migrations, no matter where you run it.
 
 Inspired by <b>Icarus</b> myth, which is  often interpreted as a cautionary tale about ego, self-sabotage, and the consequences of ignoring wise counsel.
 
@@ -255,7 +257,9 @@ private fun createLoggerFacade() = object : IcarionLogger {
 
 ```
 
----
+## Samples
+
+Take a look at working samples in the following folders ktor-sample, android-sample (TODO), desktop-sample (TODO).
 
 ## Summary
 

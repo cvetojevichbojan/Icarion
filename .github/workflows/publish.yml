@@ -6,7 +6,7 @@ on:
     types: [released, prereleased]
 jobs:
   publish:
-    name: Release build and publish
+    name: Release build test and publish
     runs-on: ubuntu-latest
     steps:
       - name: Check out code
@@ -16,8 +16,12 @@ jobs:
         with:
           distribution: 'zulu'
           java-version: 17
+      - name: Test Icarion Library
+        run:
+          ./gradlew :library:test
       - name: Publish to MavenCentral
-        run: ./gradlew publishToMavenCentral --no-configuration-cache
+        run:
+          ./gradlew publishToMavenCentral --no-configuration-cache
         env:
           ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.MAVEN_CENTRAL_USERNAME }}
           ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.MAVEN_CENTRAL_PASSWORD }}
