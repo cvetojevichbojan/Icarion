@@ -1,3 +1,8 @@
+<p align="center">
+  <img src="/release/icarion_logo_128.jpg" />
+</p>
+
+
 # Icarion - Migration Library
 
 Icarion is a lightweight, extensible migration library designed to handle version-based migrations for your application. It supports both rollback and recovery mechanisms for fine-grained control over migrations, making it ideal for settings and configuration changes, file migrations, even database updates and more.

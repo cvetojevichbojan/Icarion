@@ -10,8 +10,7 @@ kotlin {
 }
 
 dependencies {
-    implementation(project(":library"))
-
+    implementation("xyz.amplituhedron:icarion:1.0")
     implementation("io.ktor:ktor-server-core-jvm")
     implementation("io.ktor:ktor-server-netty-jvm")
     implementation("ch.qos.logback:logback-classic:1.4.5")
