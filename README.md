@@ -51,7 +51,7 @@ repositories {
 
 
 dependencies {
-    implementation("com.example:icarion:1.0.1")
+    implementation("xyz.amplituhedron:icarion:1.0.1")
 }
 ```
 ---
