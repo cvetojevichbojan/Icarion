@@ -22,7 +22,7 @@ interface IcarionLogger {
 /**
  * You can set your own logger implementation of [IcarionLogger] via [init]
  */
-object IcarionLoggerAdapter: IcarionLogger {
+object IcarionLoggerAdapter : IcarionLogger {
     private val LOCK = Any()
     private var instance: IcarionLogger? = null
 
@@ -32,10 +32,8 @@ object IcarionLoggerAdapter: IcarionLogger {
      * Invoke once per your app setup if you want to see migration logs.
      */
     fun init(logger: IcarionLogger) {
-        synchronized(LOCK) {
-            if (instance == null) {
-                instance = logger
-            }
+        if (instance == null) {
+            instance = logger
         }
     }
 
@@ -45,6 +43,7 @@ object IcarionLoggerAdapter: IcarionLogger {
     internal fun swap(adapter: IcarionLogger) {
         instance = adapter
     }
+
     override fun d(message: String) {
         instance?.d(message)
     }
@@ -52,6 +51,7 @@ object IcarionLoggerAdapter: IcarionLogger {
     override fun i(message: String) {
         instance?.i(message)
     }
+
     override fun e(t: Throwable, message: String) {
         instance?.e(t, message)
     }

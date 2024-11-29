@@ -2,6 +2,7 @@ package xyz.amplituhedron.icarion
 
 import xyz.amplituhedron.icarion.log.IcarionLogger
 import xyz.amplituhedron.icarion.log.IcarionLoggerAdapter
+import kotlin.concurrent.Volatile
 
 /**
  * Observer with callback to monitor individual migration progress

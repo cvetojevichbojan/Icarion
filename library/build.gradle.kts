@@ -1,34 +1,62 @@
+import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import com.vanniktech.maven.publish.SonatypeHost
-
 plugins {
-    alias(libs.plugins.kotlinJvm)
+    alias(libs.plugins.androidLibrary)
+    alias(libs.plugins.kotlinMultiplatform)
+
     id("com.vanniktech.maven.publish") version "0.29.0"
+
 }
 
 group = "xyz.amplituhedron"
 val artifactId = "icarion"
-version = "1.0.1"
+version = "1.1.0"
 
 kotlin {
     jvmToolchain(libs.versions.java.get().toInt())
-}
+    jvm()
+    androidTarget {
+        publishLibraryVariants("release")
 
-tasks.test {
-    useJUnitPlatform()
-    testLogging {
-        events("passed", "skipped", "failed")
+        @OptIn(ExperimentalKotlinGradlePluginApi::class)
+        compilerOptions {
+            jvmTarget.set(JvmTarget.JVM_17) // libs.versions.java.get()
+        }
+    }
+    iosX64()
+    iosArm64()
+    iosSimulatorArm64()
+    linuxX64()
+
+    sourceSets {
+        val commonMain by getting {
+            dependencies {
+                // Icarion is self-sufficient for now
+            }
+        }
+        val commonTest by getting {
+            dependencies {
+                implementation(libs.kotlinx.coroutines.test)
+
+                implementation(libs.kotlin.test)
+            }
+        }
     }
 }
 
-dependencies {
+android {
+    namespace = "xyz.amplituhedron.icarion"
+    compileSdk = libs.versions.android.compileSdk.get().toInt()
+    defaultConfig {
+        minSdk = libs.versions.android.minSdk.get().toInt()
+    }
 
-    testImplementation(platform(libs.junit.platform))
-    testImplementation(libs.junit.jupiter)
-    testImplementation(libs.strikt.core)
+    publishing {
+        singleVariant("release") {
 
-    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.2")
-
-    testImplementation(kotlin("test"))
+        }
+    }
 }
 
 mavenPublishing {
