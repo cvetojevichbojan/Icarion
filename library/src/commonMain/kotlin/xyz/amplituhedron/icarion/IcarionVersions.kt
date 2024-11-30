@@ -38,10 +38,15 @@ data class SemanticVersion(
         private const val INVALID_STRING_VERSION_MSG = "\"Invalid version format. Supported formats are [major.minor.patch] (ex. 1.2.3), [major.minor] (ex 1.4) or [major] (ex. 7)"
 
         /**
-         * Builds a SemanticVersion from String. Only basic SemVer is supported.
+         * Builds a [SemanticVersion] from String. Only basic SemVer is supported.
          *
-         * Supported formats are [major.minor.patch] (ex. 1.2.3), [major.minor] (ex 1.4) or [major] (ex. 7)
+         * Supported formats are [major].[minor].[patch] (ex. 1.2.3), [major].[minor] (ex 1.4) or [major] (ex. 7)
+         *
+         * @return [SemanticVersion]
+         *
+         * @throws IllegalArgumentException for unsupported formats
          */
+        @Throws(IllegalArgumentException::class)
         fun fromVersion(version: String): SemanticVersion {
             require(version.isNotBlank()) { INVALID_STRING_VERSION_MSG }
 

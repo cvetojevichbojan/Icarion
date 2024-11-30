@@ -1,5 +1,7 @@
-package xyz.amplituhedron.icarion
+package xyz.amplituhedron.icarion.version
 
+import xyz.amplituhedron.icarion.IntVersion
+import xyz.amplituhedron.icarion.SemanticVersion
 import kotlin.test.Test
 import kotlin.test.assertFails
 import kotlin.test.assertTrue
