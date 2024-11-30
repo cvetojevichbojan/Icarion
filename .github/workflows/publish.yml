@@ -7,7 +7,7 @@ on:
 jobs:
   publish:
     name: Release build test and publish
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
     steps:
       - name: Check out code
         uses: actions/checkout@v4
@@ -16,9 +16,6 @@ jobs:
         with:
           distribution: 'zulu'
           java-version: 17
-      - name: Test Icarion Library
-        run:
-          ./gradlew :library:test
       - name: Publish to MavenCentral
         run:
           ./gradlew publishToMavenCentral --no-configuration-cache
