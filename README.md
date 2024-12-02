@@ -3,17 +3,20 @@
 </p>
 
 
-# Icarion - Migration Library
+## Icarion - Version based updates migration library for Kotlin Multiplatform
 
-Icarion is a lightweight, extensible migration library designed to handle version-based migrations for your application. It supports both rollback and recovery mechanisms for fine-grained control over migrations, making it ideal for settings and configuration changes, file migrations, even database updates and more.
+Icarion is a lightweight, extensible migration library designed to handle version-based update migrations for your application. It supports both rollback and recovery mechanisms for fine-grained control over migrations, making it ideal for settings and configuration changes, file migrations, even database updates and more.
 
-Written 100% in Kotlin you can run it on any JVM based system: Android, Ktor, Spring, Desktop, you name it...Android based projects were the main culprit behind Icarion idea as many times devs would just perform SharedPreferences or FirebaseConfig data updates in the Application onCreate() based on current BuildConfig version value without any long term organization of migrations.    
+Written for Kotlin Multiplatform you can run it on Android, iOS and any JVM based system: Ktor, Spring, Desktop, you name it...Android based projects were the main culprit behind Icarion idea as many times devs would just perform SharedPreferences or FirebaseConfig data updates in the Application onCreate() based on current BuildConfig version value without any long term organization of migrations.    
 
 This library is here to help alleviate some of the pain of rolling out your own system of migrations, no matter where you run it.
 
-Inspired by <b>Icarus</b> myth, which is  often interpreted as a cautionary tale about ego, self-sabotage, and the consequences of ignoring wise counsel.
+Inspired by <b>Icarus</b> myth, which is  often interpreted as a cautionary tale about ego, self-sabotage, and the consequences of ignoring wise counsel. Icarus, in Greek mythology, son of the inventor Daedalus who perished by flying too near the Sun with waxen wings.
 
-    Icarus, in Greek mythology, son of the inventor Daedalus who perished by flying too near the Sun with waxen wings.
+![Kotlin](https://img.shields.io/badge/kotlin-%237F52FF.svg?style=for-the-badge&logo=kotlin&logoColor=white)
+![License](https://img.shields.io/badge/license-Apache%202.0-blue?style=flat-square)
+[![Maven Central Version](https://img.shields.io/maven-central/v/xyz.amplituhedron/icarion)](https://central.sonatype.com/artifact/xyz.amplituhedron/icarion)
+[![Publish](https://github.com/cvetojevichbojan/Icarion/actions/workflows/publish.yml/badge.svg)](https://github.com/cvetojevichbojan/Icarion/actions/workflows/publish.yml)
 
 
 ## Features
@@ -35,10 +38,6 @@ Inspired by <b>Icarus</b> myth, which is  often interpreted as a cautionary tale
 
 ---
 
-![Kotlin](https://img.shields.io/badge/kotlin-%237F52FF.svg?style=for-the-badge&logo=kotlin&logoColor=white)
-![License](https://img.shields.io/badge/license-Apache%202.0-blue?style=flat-square)
-[![Maven Central Version](https://img.shields.io/maven-central/v/xyz.amplituhedron/icarion)](https://central.sonatype.com/artifact/xyz.amplituhedron/icarion)
-
 ## Installation
 
 Add Icarion to your project as a dependency. If you use Gradle, add the following:
@@ -51,7 +50,7 @@ repositories {
 
 
 dependencies {
-    implementation("xyz.amplituhedron:icarion:1.0.1")
+    implementation("xyz.amplituhedron:icarion:1.1.0")
 }
 ```
 ---
@@ -67,6 +66,7 @@ val v1 = IntVersion(1)
 val v3 = IntVersion(3)
 
 val v1_1_1 = SemanticVersion(1, 1, 1)
+val v2_3_0 = SemanticVersion.fromVersion("2.3.0")
 ```
 
 Enums can be used as they implement comparable by default via their natural ordering:
@@ -300,10 +300,11 @@ The IcarionMigrator simplifies version migrations by handling:
 You’re now ready to run migrations in your app!
 
 ---
+### TODO
 
-## TODO
+- Support other KMP architectures?
 
-- Kotlin multiplatform
+---
 
 ## Contributing
 
